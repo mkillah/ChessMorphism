@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Position Generator</title>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/chessboard-1.0.0.min.css') }}">
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha384-ZvpUoO/+PpLXR1lu4jmpXWu80pZlYUAfxl5NsBMWOEPSjUn/6Z/hRTt8+pR6L4N2" crossorigin="anonymous"></script>
+    <script src="{{ url_for('static', filename='js/chessboard-1.0.0.min.js') }}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chess.js@0.10.3/chess.min.js"></script>
+
+    <style>
+        #board1 {
+            width: 400px;
+            height: 400px;
+            margin: 20px auto;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        button {
+            margin-top: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <img id="logo" src="{{ url_for('static', filename='images/my-logo.jpg') }}" alt="Logo">
+
+    <h1>Chess Position Generator</h1>
+
+    <label for="motifSelect">Select Checkmate Pattern:</label>
+    <select id="motifSelect">
+        {% for motif, fen in motifs.items() %}
+            <option value="{{ motif }}">{{ motif }}</option>
+        {% endfor %}
+    </select>
+
+    <button id="loadPosition">Load Selected Position</button>
+    <button id="generateAlteredPosition">Generate Altered Position Preserving the Motif</button>
+
+    <p id="feedback"></p>
+
+    <div id="board1"></div>
+
+    <p><strong>Current Position FEN:</strong> <span id="fenDisplay"></span></p>
+
+    <script>
+        // Initialize chess.js and chessboard.js
+        const game = new Chess();
+        const board = Chessboard('board1', {
+            draggable: true,
+            position: 'start',
+            onDrop: onDrop,
+            onDragStart: onDragStart,
+            onSnapEnd: onSnapEnd,
+            pieceTheme: 'https://chessboardjs.com/img/chesspieces/wikipedia/{piece}.png'  // Use the CDN for pieces
+        });
+
+        function onDragStart (source, piece, position, orientation) {
+            // Do not pick up pieces if the game is over or if it's the wrong side's turn
+            if (game.game_over()) return false;
+            if ((game.turn() === 'w' && piece.search(/^b/) !== -1) || (game.turn() === 'b' && piece.search(/^w/) !== -1)) {
+                return false;
+            }
+        }
+
+        let correctMove = '';  // Store the correct move for validation
+
+        function onDrop (source, target) {
+            // Try to make the move using chess.js
+            var move = game.move({
+                from: source,
+                to: target,
+                promotion: 'q'  // Always promote to queen for simplicity
+            });
+
+            // If the move is illegal, snap the piece back
+            if (move === null) return 'snapback';
+
+            // Validate the move
+            const userMove = source + target;
+            if (userMove === correctMove) {
+                $('#feedback').text('Correct move!');  // Inform the user about the correct move
+            } else {
+                $('#feedback').text('Incorrect move, try again.');  // Inform the user about the incorrect move
+                console.log('correctMove:', correctMove);
+
+            }
+
+            // Update the board position and the FEN display
+            onSnapEnd();
+            updateStatus();
+        }
+
+        function onSnapEnd() {
+            // Update the position on the chessboard
+            board.position(game.fen());
+        }
+
+        function updateStatus() {
+            var status = '';
+            var moveColor = 'White';
+            if (game.turn() === 'b') {
+                moveColor = 'Black';
+            }
+
+            // Checkmate?
+            if (game.in_checkmate()) {
+                status = 'Game over, ' + moveColor + ' is in checkmate.';
+            } else if (game.in_draw()) {
+                status = 'Game over, drawn position';
+            } else {
+                status = moveColor + ' to move';
+                if (game.in_check()) {
+                    status += ', ' + moveColor + ' is in check';
+                }
+            }
+
+            // Update the UI with the status, FEN, and PGN
+            $('#status').html(status);
+            $('#fenDisplay').html(game.fen());
+            $('#pgn').html(game.pgn());
+        }
+
+        // Load the initial position and update the FEN display
+        function loadInitialPosition() {
+            const initialFEN = game.fen();  // Get the initial position FEN
+            updateFENDisplay(initialFEN);   // Update the FEN display
+        }
+
+        // Function to update and display the current FEN
+        function updateFENDisplay(fen) {
+            document.getElementById('fenDisplay').textContent = fen;  // Update the FEN display element
+        }
+
+
+        // Function to extract who is on the move from FEN string
+        function getPlayerOnMove(fen) {
+        // FEN format is "piece_layout active_color castling_rights en_passant halfmove_clock fullmove_number"
+        const parts = fen.split(' ');
+        const activeColor = parts[1]; // 'w' for white, 'b' for black
+        return activeColor === 'w' ? "White" : "Black";
+}
+
+        // Button to load selected motif's main FEN
+        $('#loadPosition').on('click', function() {
+            const selectedMotif = $('#motifSelect').val();
+            $.ajax({
+                url: '/generate_fen',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ motif: selectedMotif, alternate: false }),
+                success: function(response) {
+                    console.log('Position loaded:', response.fen);
+                    game.load(response.fen);  // Set the new position in chess.js
+                    board.position(response.fen);  // Update the board position
+                    correctMove = response.correct_move;  // Get the correct move for validation
+                    updateFENDisplay(response.fen);  // Update the FEN display
+                    updateStatus();  // Update the game status
+                    // Extract number of moves to play
+                    const n_moves = response.n_moves;
+                    // Extract who is on the move from FEN
+                    const playerOnMove = getPlayerOnMove(response.fen);
+                    $('#feedback').text(playerOnMove + "'s turn. Mate in " + n_moves);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error loading position:', error);
+                }
+            });
+        });
+
+        // Button to load alternate motif's FEN
+        $('#generateAlteredPosition').on('click', function() {
+            const selectedMotif = $('#motifSelect').val();
+            $.ajax({
+                url: '/generate_fen',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({ motif: selectedMotif, alternate: true }),
+                success: function(response) {
+                    console.log('Altered position generated:', response.fen);
+                    game.load(response.fen);  // Set the new position in chess.js
+                    board.position(response.fen);  // Update the board position
+                    correctMove = response.correct_move;  // Get the correct move for validation
+                    updateFENDisplay(response.fen);  // Update the FEN display
+                    updateStatus();  // Update the game status
+                    // Extract number of moves to play
+                    const n_moves = response.n_moves;
+                    // Extract who is on the move from FEN
+                    const playerOnMove = getPlayerOnMove(response.fen);
+                    $('#feedback').text(playerOnMove + "'s turn. Mate in " + n_moves);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error generating altered position:', error);
+                }
+            });
+        });
+
+        // Initialize the board and load the initial position
+        loadInitialPosition();
+    </script>
+</body>
+</html>

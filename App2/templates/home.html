@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Methaphorious</title>
+    <style>
+        body {
+            text-align: center;
+        }
+
+        .header {
+            background-color: #f0f0f0;
+            padding: 10px;
+        }
+
+        .logo {
+            max-width: 100%;
+        }
+
+        .button-container {
+            margin: 20px 0;
+        }
+
+        button {
+            margin: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <!-- Logo image -->
+        <img class="logo" src="{{ url_for('static', filename='images/my-logo.jpg') }}" alt="Methaphorious Logo">
+    </div>
+
+    <div class="button-container">
+        <form>
+            <!-- Learn button -->
+            <button type="submit" formaction="/learning">Learn</button>
+
+            <!-- Analogy button -->
+            <button type="submit" formaction="/positionAnalogy">Analogy</button>
+        </form>
+    </div>
+</body>
+</html>
