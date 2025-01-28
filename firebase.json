@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist", // Replace "dist" with your build output directory
+    "source": "https://github.com/<your-github-username>/<your-repo-name>.git",
     "ignore": [
       "firebase.json",
       "**/.*",
@@ -11,7 +11,6 @@
         "source": "**",
         "destination": "/templates/index.html"
       }
-    ],
-    "source": "https://github.com/mkillah/ChessMorphism.git" // This is the key!
+    ]
   }
 }
