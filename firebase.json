@@ -8,9 +8,10 @@
     ],
     "rewrites": [
       {
-        "source": "https://github.com/mkillah/ChessMorphism",
+        "source": "**",
         "destination": "/templates/index.html"
       }
-    ]
+    ],
+    "source": "https://github.com/<your-github-username>/<your-repo-name>.git" // This is the key!
   }
 }
