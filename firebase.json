@@ -8,7 +8,7 @@
     ],
     "rewrites": [
       {
-        "source": "**",
+        "source": "https://github.com/mkillah/ChessMorphism",
         "destination": "/templates/index.html"
       }
     ]
