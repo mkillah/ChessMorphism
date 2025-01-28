@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "source": "https://github.com/<your-github-username>/<your-repo-name>.git",
+    "source": "https://github.com/mkillah/ChessMorphism.git",
     "ignore": [
       "firebase.json",
       "**/.*",
