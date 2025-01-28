@@ -1,0 +1,16 @@
+{
+  "hosting": {
+    "public": "dist", // Replace "dist" with your build output directory
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/templates/index.html"
+      }
+    ]
+  }
+}

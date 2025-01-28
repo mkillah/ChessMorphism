@@ -4,7 +4,7 @@ import random
 
 app = Flask(__name__)
 
-df = pd.read_csv("App2/alternated_preserved_motif_positions.csv")
+df = pd.read_csv("dist/alternated_preserved_motif_positions.csv")
 
 # MOTIFS and ALTERNATE_MOTIFS dictionaries (storing both FENs as pairs)
 MOTIFS = {}
