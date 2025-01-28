@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "source": "https://github.com/mkillah/ChessMorphism.git",
+    "public": "dist",
     "ignore": [
       "firebase.json",
       "**/.*",
