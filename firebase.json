@@ -12,6 +12,6 @@
         "destination": "/templates/index.html"
       }
     ],
-    "source": "https://github.com/<your-github-username>/<your-repo-name>.git" // This is the key!
+    "source": "https://github.com/mkillah/ChessMorphism.git" // This is the key!
   }
 }
