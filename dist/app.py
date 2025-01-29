@@ -4,7 +4,7 @@ import random
 
 app = Flask(__name__)
 
-df = pd.read_csv("dist/alternated_preserved_motif_positions.csv")
+df = pd.read_csv("C:/Users/marko/PycharmProjects/ChessMorphism//dist/alternated_preserved_motif_positions.csv")
 
 # MOTIFS and ALTERNATE_MOTIFS dictionaries (storing both FENs as pairs)
 MOTIFS = {}
@@ -67,3 +67,5 @@ def generate_fen():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
+# https://www.youtube.com/watch?v=_u-VAFwY95U

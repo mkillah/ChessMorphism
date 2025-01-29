@@ -27,13 +27,19 @@
             font-size: 16px;
             cursor: pointer;
         }
+        #feedback {
+        font-weight: bold;
+        }
+
     </style>
 </head>
 <body>
 
     <img id="logo" src="{{ url_for('static', filename='images/my-logo.jpg') }}" alt="Logo">
 
-    <h1>Chess Position Generator</h1>
+    <h1>Checkmate Pattern Generator</h1>
+
+    <p>Generate checkmate position or alter the position by preserving the checkmate pattern</p>
 
     <label for="motifSelect">Select Checkmate Pattern:</label>
     <select id="motifSelect">
@@ -42,8 +48,8 @@
         {% endfor %}
     </select>
 
-    <button id="loadPosition">Load Selected Position</button>
-    <button id="generateAlteredPosition">Generate Altered Position Preserving the Motif</button>
+    <button id="loadPosition">Load Position</button>
+    <button id="generateAlteredPosition">Alter Position</button>
 
     <p id="feedback"></p>
 
